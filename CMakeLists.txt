@@ -46,7 +46,7 @@ option( MATH_USE_FUZZY_EQUALS "Allow error delta when comparing floating point d
 option( MATH_USE_DOUBLES      "Use double precision floats" off )
 option( MATH_DEBUG_MODE       "Enable assertions in math calculations (slow)" on )
 option( MATH_INTRINSICS_VS    "Enable SSE optimizations using MSVS intrinsics" off)
-option( MATH_STATIC_LIB       "Build smath as a static library" on)
+option( MATH_STATIC_LIBRARY   "Build smath as a static library" on)
 option( MATH_UNIT_TESTS       "Build smath unit tests" on)
 
 # set up math config
@@ -73,33 +73,78 @@ set(CPACK_RPM_PACKAGE_DESCRIPTION "
 smath is a 2D and 3D light weight math library written using modern C++ techniques. It is designed to be easy to use, understand, and fully unit tested.
 It includes 2D/3D/4D vectors, 3D/4D matrices, rotations, interpolations, random values and other math utilities.")
 
+#============================================================================
 # Build configuration
+#============================================================================
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/src )
 
-# Initialize CXXFLAGS.
-set(CMAKE_CXX_FLAGS                "-Wall -Wextra -std=c++11")
-set(CMAKE_CXX_FLAGS_DEBUG          "-O0 -g")
-set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE        "-O4 -DNDEBUG")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+	set(CMAKE_CXX_FLAGS                "-Wall -Wextra -std=c++11")
+	set(CMAKE_CXX_FLAGS_DEBUG          "-O0 -g")
+	set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
+	set(CMAKE_CXX_FLAGS_RELEASE        "-O4 -DNDEBUG")
+	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
 
-# Compiler-specific C++11 activation.
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
     if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
         message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.7 or greater.")
     endif ()
-elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+	set(CMAKE_CXX_FLAGS                "-Wall -Wextra -std=c++11")
+	set(CMAKE_CXX_FLAGS_DEBUG          "-O0 -g")
+	set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
+	set(CMAKE_CXX_FLAGS_RELEASE        "-O4 -DNDEBUG")
+	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-else ()
+elseif( MSVC11 )
+	# Workaround for the fact that vc++ does not support vardic templates (yet)
+	add_definitions(/D_VARIADIC_MAX=10)
+
+	# Libcommon flags and other global flags
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNDEBUG=1=1 /D_DEBUG=1 /DUNICODE /D_UNICODE")
+
+	# Enable security checks
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Gs")
+
+	# Disable several level 4 warnings about ansi compliance
+	# (-wNNN)
+	# - Not using Microsoft's 'secure' file functions
+	# - Dead functions generated from glut
+	# - Non-existant PDB files (we should probably fix this)
+	# - Warning about nameless struct/union
+	# - conditional expression is constant ( assert( x && "..." ) )
+	# - unknown pragma
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996 /wd4505 /wd4099 /wd4201 /wd4127 /wd4068")
+
+	# Misc options
+	# J: Make visual studio treat chars as unsigned rather than signed
+	# Zi: Generate PDB for debugging
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2 /nologo /J /Zi")
+	
+	# Defines specific for windows platform
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DWIN32_LEAN_AND_MEAN")
+else()
     message(FATAL_ERROR "Your C++ compiler does not support C++11.")
-endif ()
+endif()
+
+set(variables
+  CMAKE_C_FLAGS_DEBUG
+  CMAKE_C_FLAGS_MINSIZEREL
+  CMAKE_C_FLAGS_RELEASE
+  CMAKE_C_FLAGS_RELWITHDEBINFO
+  CMAKE_CXX_FLAGS_DEBUG
+  CMAKE_CXX_FLAGS_MINSIZEREL
+  CMAKE_CXX_FLAGS_RELEASE
+  CMAKE_CXX_FLAGS_RELWITHDEBINFO
+)
 
 # Static and dynamic library
 if( MATH_STATIC_LIBRARY )
+	message( "Building smath as a static library" )
     add_library( smath STATIC ${smath_SOURCES} ${smath_HEADERS} )
 else()
+	message( "Building smath as a dynamic library" )
     add_library( smath SHARED ${smath_SOURCES} ${smath_HEADERS} )
 endif()
 
@@ -110,21 +155,21 @@ if( MATH_UNIT_TESTS )
     add_subdirectory( thirdparty/gtest )
     include_directories( thirdparty/gtest/src )
     enable_testing()
+	
+	fix_default_compiler_settings_()
+	add_library( smath_unittest STATIC ${smath_SOURCES} ${smath_HEADERS} )
 
-    add_executable( smath_tests thirdparty/gtest/src/gtest_main.cc ${smath_TESTS} )
-    target_link_libraries( smath_tests smath gtest )
-
-    add_gtest( test_angle smath )
-    add_gtest( test_conversions smath )
-    add_gtest( test_interpolation smath )
-    add_gtest( test_matrix4 smath )
-    add_gtest( test_matrixutils smath )
-    add_gtest( test_quaternion smath )
-    add_gtest( test_rect smath )
-    add_gtest( test_utils smath )
-    add_gtest( test_vector4 smath )
-    add_gtest( test_vector3 smath )
-    add_gtest( test_vector2 smath )
+    add_gtest( test_angle smath_unittest )
+    add_gtest( test_conversions smath_unittest )
+    add_gtest( test_interpolation smath_unittest )
+    add_gtest( test_matrix4 smath_unittest )
+    add_gtest( test_matrixutils smath_unittest )
+    add_gtest( test_quaternion smath_unittest )
+    add_gtest( test_rect smath_unittest )
+    add_gtest( test_utils smath_unittest )
+    add_gtest( test_vector4 smath_unittest )
+    add_gtest( test_vector3 smath_unittest )
+    add_gtest( test_vector2 smath_unittest )
 endif()
 
 # Installation
