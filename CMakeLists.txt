@@ -128,17 +128,6 @@ else()
     message(FATAL_ERROR "Your C++ compiler does not support C++11.")
 endif()
 
-set(variables
-  CMAKE_C_FLAGS_DEBUG
-  CMAKE_C_FLAGS_MINSIZEREL
-  CMAKE_C_FLAGS_RELEASE
-  CMAKE_C_FLAGS_RELWITHDEBINFO
-  CMAKE_CXX_FLAGS_DEBUG
-  CMAKE_CXX_FLAGS_MINSIZEREL
-  CMAKE_CXX_FLAGS_RELEASE
-  CMAKE_CXX_FLAGS_RELWITHDEBINFO
-)
-
 # Static and dynamic library
 if( MATH_STATIC_LIBRARY )
 	message( "Building smath as a static library" )
@@ -156,7 +145,10 @@ if( MATH_UNIT_TESTS )
     include_directories( thirdparty/gtest/src )
     enable_testing()
 	
-	fix_default_compiler_settings_()
+    if(MSVC)
+        fix_default_compiler_settings_()
+    endif()
+
 	add_library( smath_unittest STATIC ${smath_SOURCES} ${smath_HEADERS} )
 
     add_gtest( test_angle smath_unittest )

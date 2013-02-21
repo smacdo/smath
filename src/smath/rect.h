@@ -16,8 +16,6 @@
 #ifndef SCOTT_MATH_RECT_H
 #define SCOTT_MATH_RECT_H
 
-// TODO: Convert floats to scalar_t
-
 #include <smath/vector.h>
 #include <smath/config.h>
 
@@ -27,7 +25,7 @@
 class RectF
 {
 public:
-    RectF( const TVector2<scalar_t>& topLeft, const TVector2<scalar_t>& rectSize )
+    RectF( const TVector2<float>& topLeft, const TVector2<float>& rectSize )
         : mTopLeft( topLeft ),
           mSize( rectSize )
     {
@@ -65,37 +63,37 @@ public:
         return !( mTopLeft == rect.mTopLeft && mSize == rect.mSize ); 
     }
 
-    TVector2<scalar_t> position() const
+    TVector2<float> position() const
     {
         return mTopLeft;
     }
 
-    TVector2<scalar_t> topLeft() const
+    TVector2<float> topLeft() const
     {
         return mTopLeft;
     }
 
-    TVector2<scalar_t> topRight() const
+    TVector2<float> topRight() const
     {
-        return TVector2<scalar_t>( mTopLeft.x() + mSize.x(), mTopLeft.y() );
+        return TVector2<float>( mTopLeft.x() + mSize.x(), mTopLeft.y() );
     }
 
-    TVector2<scalar_t> bottomLeft() const
+    TVector2<float> bottomLeft() const
     {
-        return TVector2<scalar_t>( mTopLeft.x(), mTopLeft.y() + mSize.y() );
+        return TVector2<float>( mTopLeft.x(), mTopLeft.y() + mSize.y() );
     }
     
-    TVector2<scalar_t> bottomRight() const
+    TVector2<float> bottomRight() const
     {
         return mTopLeft + mSize;
     }
 
-    TVector2<scalar_t> center() const
+    TVector2<float> center() const
     {
         return ( mTopLeft + mSize ) / 2.0f;
     }
 
-    TVector2<scalar_t> size() const
+    TVector2<float> size() const
     {
         return mSize;
     }
@@ -130,23 +128,23 @@ public:
         return mSize.y();
     }
 
-    void move( const TVector2<scalar_t>& delta )
+    void move( const TVector2<float>& delta )
     {
         mTopLeft += delta;
     }
 
-    void moveTo( const TVector2<scalar_t>& position )
+    void moveTo( const TVector2<float>& position )
     {
         mTopLeft = position;
     }
 
-    void adjustSize( const TVector2<scalar_t>& newSize )
+    void adjustSize( const TVector2<float>& newSize )
     {
         mSize += newSize;
         SMATH_ASSERT( mSize.x() > 0.0f && mSize.y() > 0.0f, "Invalid dimensions" );
     }
 
-    void resize( const TVector2<scalar_t>& newSize )
+    void resize( const TVector2<float>& newSize )
     {
         SMATH_ASSERT( newSize.x() > 0.0f && newSize.y() > 0.0f, "Invalid dimensions" );
         mSize = newSize;
@@ -154,12 +152,12 @@ public:
 
     void resize( float width, float height )
     {
-        resize( TVector2<scalar_t>( width, height ) );
+        resize( TVector2<float>( width, height ) );
     }
 
-    bool contains( const TVector2<scalar_t>& point ) const
+    bool contains( const TVector2<float>& point ) const
     {
-        TVector2<scalar_t> pt = point - mTopLeft;
+        TVector2<float> pt = point - mTopLeft;
 
         return ( pt.x() >= 0.0f && pt.x() <= mSize.x() &&
                  pt.y() >= 0.0f && pt.y() <= mSize.y() );
@@ -176,8 +174,8 @@ public:
     }
 
 private:
-    TVector2<scalar_t> mTopLeft;
-    TVector2<scalar_t> mSize;
+    TVector2<float> mTopLeft;
+    TVector2<float> mSize;
 };
 
 #endif

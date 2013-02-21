@@ -5,6 +5,8 @@
 #include <gtest/gtest.h>
 #include <smath/vector.h>
 
+#include "unittesthelpers.h"
+
 #ifndef MATH_TYPEDEFS
 typedef TVector4<float> Vec4;
 #endif
@@ -351,7 +353,11 @@ TEST(Math, Vector4_Normalization)
     const Vec4 a( 3.0f, 1.0f, 2.0f,-4.0f );
     const Vec4 n = normalized( a );
 
-    EXPECT_EQ( Vec4( 0.547722557f, 0.182574186f, 0.365148371f, -0.730296743f), n );
+    EXPECT_TRUE(
+        VectorEquals(
+            Vec4( 0.547722557f, 0.182574186f, 0.365148371f, -0.730296743f),
+            n )
+    );
 }
 
 TEST(Math, Vector4_Serialization)

@@ -5,6 +5,8 @@
 #include <gtest/gtest.h>
 #include <smath/matrix.h>
 
+#include "unittesthelpers.h"
+
 #ifndef MATH_TYPEDEFS
 typedef TMatrix4<float> Mat4;
 #endif
@@ -134,7 +136,7 @@ TEST(Math,Matrix4_Addition)
 
     Mat4 r( a + b );
 
-    EXPECT_EQ( v, r );
+    EXPECT_TRUE( MatrixEquals( v, r ) );
 }
 
 TEST(Math,Matrix4_SelfAddition)
@@ -156,9 +158,9 @@ TEST(Math,Matrix4_SelfAddition)
 
     a += b;
 
-    EXPECT_EQ( a, v );
-    EXPECT_NE( b, v );
-    EXPECT_NE( a, b );
+    EXPECT_TRUE(  MatrixEquals( a, v ) );
+    EXPECT_FALSE( MatrixEquals( b, v ) );
+    EXPECT_FALSE( MatrixEquals( a, b ) );
 }
 
 TEST(Math,Matrix4_Subtraction)
@@ -180,7 +182,7 @@ TEST(Math,Matrix4_Subtraction)
 
     Mat4 r( a - b );
 
-    EXPECT_EQ( v, r );
+    EXPECT_TRUE( MatrixEquals( v, r ) );
 }
 
 TEST(Math,Matrix4_SelfSubtraction)
@@ -201,9 +203,9 @@ TEST(Math,Matrix4_SelfSubtraction)
             -3.9f,  8.0f, 2.5f, 7.0f );
     a -= b;
 
-    EXPECT_EQ( a, v );
-    EXPECT_NE( a, b );
-    EXPECT_NE( b, v );
+    EXPECT_TRUE( MatrixEquals( a, v ) );
+    EXPECT_FALSE( MatrixEquals( a, b ) );
+    EXPECT_FALSE( MatrixEquals( b, v ) );
 }
 
 TEST(Math,Matrix4_Multiplication)
@@ -243,7 +245,7 @@ TEST(Math,Matrix4_Multiplication2)
                  -1.0f/50.0f,  -73.0f/100.0f, -42.0f/25.0f,   -139.0f/100.0f,
                   57.0f/50.0f,  68.0f/25.0f,   209.0f/100.0f,  5.0f/2.0f );
 
-        EXPECT_EQ( v, a * b );
+        EXPECT_TRUE( MatrixEquals( v, a * b ) );
 }
 
 TEST(Math,Matrix4_Transpose)
@@ -288,7 +290,7 @@ TEST(Math,Matrix4_Inverse)
                   -0.0722101f, -0.107221f, -0.210066f,   0.14442f,
                    0.0350109f,  0.203501f,  0.0109409f, -0.0700219f );
 
-    EXPECT_EQ( r, inverse( a ) );
+    EXPECT_TRUE( MatrixEquals( r, inverse( a ) ) );
 }
 
 TEST(Math,Matrix4_SelfEquality)

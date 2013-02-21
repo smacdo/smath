@@ -18,18 +18,7 @@
 
 /* #undef MATH_TYPEDEFS */
 /* #undef MATH_FUZZY_EQUALS */
-/* #undef MATH_DOUBLE */
 /* #undef MATH_DEBUG */
-
-/**
- * Defines the Scalar type, which is used by the math library to determine
- * the precision of a floating point value.
- */
-#ifdef MATH_DOUBLE
-    typedef double scalar_t;
-#else
-    typedef float scalar_t;
-#endif
 
 /**
  * Math assertion macro. Assertions in the mathlibrary use math_assert,

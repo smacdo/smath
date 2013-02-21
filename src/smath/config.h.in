@@ -18,18 +18,7 @@
 
 #cmakedefine MATH_TYPEDEFS
 #cmakedefine MATH_FUZZY_EQUALS
-#cmakedefine MATH_DOUBLE
 #cmakedefine MATH_DEBUG
-
-/**
- * Defines the Scalar type, which is used by the math library to determine
- * the precision of a floating point value.
- */
-#ifdef MATH_DOUBLE
-    typedef double scalar_t;
-#else
-    typedef float scalar_t;
-#endif
 
 /**
  * Math assertion macro. Assertions in the mathlibrary use math_assert,
