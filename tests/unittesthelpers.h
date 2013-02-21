@@ -2,6 +2,10 @@
 #include <string>
 using namespace testing;
 
+// Credit for the AlmostEquals method:
+//  http://randomascii.wordpress.com/2012/01/11/tricks-with-the-floating-point-format/
+//  http://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
+
 bool AlmostEquals( float, float, float, int );
 
 bool AlmostEquals( float a, float b )
