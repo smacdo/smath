@@ -6,7 +6,7 @@
 #include <smath/vector.h>
 
 #ifndef MATH_TYPEDEFS
-typedef TVector2<float> Vec2;
+typedef TVector2<scalar_t> Vec2;
 #endif
 
 TEST(Math, Vector2_DefaultContructor)

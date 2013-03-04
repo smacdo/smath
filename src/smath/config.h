@@ -18,7 +18,7 @@
 
 /* #undef MATH_TYPEDEFS */
 /* #undef MATH_FUZZY_EQUALS */
-/* #undef MATH_DOUBLE */
+#define MATH_DOUBLE
 /* #undef MATH_DEBUG */
 
 /**
