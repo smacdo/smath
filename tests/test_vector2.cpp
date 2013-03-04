@@ -5,6 +5,8 @@
 #include <gtest/gtest.h>
 #include <smath/vector.h>
 
+#include "unittesthelpers.h"
+
 #ifndef MATH_TYPEDEFS
 typedef TVector2<scalar_t> Vec2;
 #endif
@@ -307,5 +309,9 @@ TEST(Math, Vector2_Normalization)
     const Vec2 a( 3.0f, 1.0f );
     const Vec2 n = normalized( a );
 
-    EXPECT_EQ( Vec2( 0.948683298f, 0.316227766f ), n );
+    EXPECT_TRUE(
+            VectorEquals( 
+                Vec2( 0.948683298f, 0.316227766f ),
+                n )
+    );
 }

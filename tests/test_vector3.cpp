@@ -4,6 +4,7 @@
  */
 #include <gtest/gtest.h>
 #include <smath/vector.h>
+#include "unittesthelpers.h"
 
 #ifndef MATH_TYPEDEFS
 typedef TVector3<float> Vec3;
@@ -158,10 +159,12 @@ TEST(Math, Vector3_EqualityOperator)
 
 TEST(Math, Vector3_EqualityOperatorPrecision)
 {
+#ifdef MATH_FUZZY_EQUALS
     const Vec3 a( 2.2f, -0.333f, 1.5f );
     const Vec3 b( 4.4f/2.0f, -0.999f/3.0f, 0.5f * 3.0f );
 
     EXPECT_EQ( a, b );
+#endif
 }
 
 TEST(Math, Vector3_InequalityOperator)
@@ -405,7 +408,9 @@ TEST(Math, Vector3_Normalization)
     const Vec3 a( 3.0f, 1.0f, 2.0f );
     const Vec3 n = normalized( a );
 
-    EXPECT_EQ( Vec3( 0.801784f, 0.267261f, 0.534522f ), n );
+    EXPECT_TRUE( 
+            VectorEquals<float>( 
+                Vec3( 0.801784f, 0.267261f, 0.534522f ), n ) );
 }
 
 TEST(Math, Vector3_RotateAroundXZero)
@@ -418,21 +423,21 @@ TEST(Math, Vector3_RotateAroundX)
 {
     // First trial
     const Vec3 a( 0.0f, 1.0f, 0.0f );
-    EXPECT_EQ( Vec3( 0.0f,  0.707106f,  0.707106f ), rotateAroundX( a, 45.0f ) );
-    EXPECT_EQ( Vec3( 0.0f,  0.0f,       1.0f ),      rotateAroundX( a, 90.0f ) );
-    EXPECT_EQ( Vec3( 0.0f, -1.0f,       0.0f ),      rotateAroundX( a, 180.0f ) );
-    EXPECT_EQ( Vec3( 0.0f, -0.707106f, -0.707106f ), rotateAroundX( a, 225.0f ) );
-    EXPECT_EQ( Vec3( 0.0f,  0.0f,      -1.0f ),      rotateAroundX( a, 270.0f ) );
-    EXPECT_EQ( Vec3( 0.0f,  0.707106f, -0.707106f ), rotateAroundX( a, 315.0f ) );
+    EXPECT_TRUE( VectorEquals( Vec3( 0.0f,  0.707106f,  0.707106f ), rotateAroundX( a, 45.0f ) ) );
+    EXPECT_TRUE( VectorEquals( Vec3( 0.0f,  0.0f,       1.0f ),      rotateAroundX( a, 90.0f ) ) );
+    EXPECT_TRUE( VectorEquals( Vec3( 0.0f, -1.0f,       0.0f ),      rotateAroundX( a, 180.0f ) ) );
+    EXPECT_TRUE( VectorEquals( Vec3( 0.0f, -0.707106f, -0.707106f ), rotateAroundX( a, 225.0f ) ) );
+    EXPECT_TRUE( VectorEquals( Vec3( 0.0f,  0.0f,      -1.0f ),      rotateAroundX( a, 270.0f ) ) );
+    EXPECT_TRUE( VectorEquals( Vec3( 0.0f,  0.707106f, -0.707106f ), rotateAroundX( a, 315.0f ) ) );
 
     // Second trial... moving shouldn't efect rotation at all
     const Vec3 b( 2.0f, 1.0f, 0.0f );
-    EXPECT_EQ( Vec3( 2.0f,  0.707106f,  0.707106f ), rotateAroundX( b, 45.0f ) );
-    EXPECT_EQ( Vec3( 2.0f,  0.0f,       1.0f ),      rotateAroundX( b, 90.0f ) );
-    EXPECT_EQ( Vec3( 2.0f, -1.0f,       0.0f ),      rotateAroundX( b, 180.0f ) );
-    EXPECT_EQ( Vec3( 2.0f, -0.707106f, -0.707106f ), rotateAroundX( b, 225.0f ) );
-    EXPECT_EQ( Vec3( 2.0f,  0.0f,      -1.0f ),      rotateAroundX( b, 270.0f ) );
-    EXPECT_EQ( Vec3( 2.0f,  0.707106f, -0.707106f ), rotateAroundX( b, 315.0f ) );
+    VectorEquals<float>( Vec3( 2.0f,  0.707106f,  0.707106f ), rotateAroundX( b, 45.0f ) );
+    VectorEquals<float>( Vec3( 2.0f,  0.0f,       1.0f ),      rotateAroundX( b, 90.0f ) );
+    VectorEquals<float>( Vec3( 2.0f, -1.0f,       0.0f ),      rotateAroundX( b, 180.0f ) );
+    VectorEquals<float>( Vec3( 2.0f, -0.707106f, -0.707106f ), rotateAroundX( b, 225.0f ) );
+    VectorEquals<float>( Vec3( 2.0f,  0.0f,      -1.0f ),      rotateAroundX( b, 270.0f ) );
+    VectorEquals<float>( Vec3( 2.0f,  0.707106f, -0.707106f ), rotateAroundX( b, 315.0f ) );
 }
 
 TEST(Math, Vector3_RotateAroundYZero)
