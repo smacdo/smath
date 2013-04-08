@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
-#include <string>
+#include <smath/vector.h>
+#include <smath/matrix.h>
+
 using namespace testing;
 
 // Credit for the AlmostEquals method:
@@ -65,13 +67,9 @@ bool AlmostEquals( float a, float b, float maxDiff, int maxUlps )
     return false;
 }
 
-template<typename T>
-::testing::AssertionResult VectorEquals( const TVector2<T>& expected,
-                                         const TVector2<T>& actual )
+::testing::AssertionResult VectorEquals( const TVector2<float>& expected,
+                                         const TVector2<float>& actual )
 {
-    const float MAX_DIFF = 0.000001f;
-    const int MAX_ULPS = 10;
-
     bool xe = AlmostEquals( expected[0], actual[0] );
     bool ye = AlmostEquals( expected[1], actual[1] );
 
@@ -91,13 +89,9 @@ template<typename T>
     }
 }
 
-template<typename T>
-::testing::AssertionResult VectorEquals( const TVector3<T>& expected,
-                                         const TVector3<T>& actual )
+::testing::AssertionResult VectorEquals( const TVector3<float>& expected,
+                                         const TVector3<float>& actual )
 {
-    const float MAX_DIFF = 0.000001f;
-    const int MAX_ULPS = 10;
-
     bool xe = AlmostEquals( expected[0], actual[0] );
     bool ye = AlmostEquals( expected[1], actual[1] );
     bool ze = AlmostEquals( expected[2], actual[2] );
@@ -120,13 +114,9 @@ template<typename T>
     }
 }
 
-template<typename T>
-::testing::AssertionResult VectorEquals( const TVector4<T>& expected,
-                                         const TVector4<T>& actual )
+::testing::AssertionResult VectorEquals( const TVector4<float>& expected,
+                                         const TVector4<float>& actual )
 {
-    const float MAX_DIFF = 0.000001f;
-    const int MAX_ULPS = 10;
-
     bool xe = AlmostEquals( expected[0], actual[0] );
     bool ye = AlmostEquals( expected[1], actual[1] );
     bool ze = AlmostEquals( expected[2], actual[2] );

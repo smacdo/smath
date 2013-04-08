@@ -8,7 +8,7 @@
 #include "unittesthelpers.h"
 
 #ifndef MATH_TYPEDEFS
-typedef TVector2<scalar_t> Vec2;
+typedef TVector2<float> Vec2;
 #endif
 
 TEST(Math, Vector2_DefaultContructor)
@@ -314,4 +314,39 @@ TEST(Math, Vector2_Normalization)
                 Vec2( 0.948683298f, 0.316227766f ),
                 n )
     );
+}
+
+TEST(Math, Vector2_Lerp)
+{
+    const Vec2 a( 1.0f, 2.0f );
+    const Vec2 b( 2.0f, 4.0f );
+
+    EXPECT_TRUE( VectorEquals( Vec2( 1.0f, 2.0f ), lerp( a, b, 0.0f ) ) );
+    EXPECT_TRUE( VectorEquals( Vec2( 1.5f, 3.0f ), lerp( a, b, 0.5f ) ) );
+    EXPECT_TRUE( VectorEquals( Vec2( 2.0f, 4.0f ), lerp( a, b, 1.0f ) ) );
+}
+
+TEST(Math, Vector2_Min)
+{
+    const Vec2 a( 1.0f, 3.0f );
+    const Vec2 b( 1.5f, 2.0f );
+
+    EXPECT_TRUE( VectorEquals( Vec2( 1.0f, 2.0f ), min( a, b ) ) );
+}
+
+TEST(Math, Vector2_Max)
+{
+    const Vec2 a( 1.0f, 3.0f );
+    const Vec2 b( 1.5f, 2.0f );
+
+    EXPECT_TRUE( VectorEquals( Vec2( 1.5f, 3.0f ), max( a, b ) ) );
+}
+
+TEST(Math, Vector2_Clamp)
+{
+    const Vec2 a( 1.5f, 1.5f );
+    const Vec2 min( 1.0f, 2.0f );
+    const Vec2 max( 2.0f, 3.0f );
+
+    EXPECT_TRUE( VectorEquals( Vec2( 1.5f, 2.0f ), clamp( a, min, max ) ) );
 }

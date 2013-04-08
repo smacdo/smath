@@ -180,6 +180,18 @@ namespace Math
         return a - std::floor( a );
     }
 
+    template<typename T>
+    inline T min( const T a, const T b )
+    {
+        return ( a < b ? a : b );
+    }
+
+    template<typename T>
+    inline T max( const T a, const T b )
+    {
+        return ( b < a ? a : b );
+    }
+
     /**
      * Takes a value, and clamps the value to be in the range [min,max].
      * If it falls out of this range it will be set to the closest value

@@ -110,6 +110,16 @@ TEST(Math,Utils_NotZero_False)
     EXPECT_FALSE(Math::notZero( (bool) false ));
 }
 
+TEST(Math, Utils_Min)
+{
+    EXPECT_FLOAT_EQ( 2.5f, Math::min( 5.0f, 2.5f ) );
+}
+
+TEST(Math, Utils_Max)
+{
+    EXPECT_FLOAT_EQ( 5.0f, Math::max( 5.0f, 2.5f ) );
+}
+
 //===========================================================================
 // Clamp
 //===========================================================================

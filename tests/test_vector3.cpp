@@ -408,9 +408,11 @@ TEST(Math, Vector3_Normalization)
     const Vec3 a( 3.0f, 1.0f, 2.0f );
     const Vec3 n = normalized( a );
 
-    EXPECT_TRUE( 
-            VectorEquals<float>( 
-                Vec3( 0.801784f, 0.267261f, 0.534522f ), n ) );
+    ::testing::AssertionResult result =
+        VectorEquals( Vec3( 0.801784f, 0.267261f, 0.534522f ),
+                             n );
+
+    EXPECT_TRUE( result );
 }
 
 TEST(Math, Vector3_RotateAroundXZero)
@@ -432,12 +434,12 @@ TEST(Math, Vector3_RotateAroundX)
 
     // Second trial... moving shouldn't efect rotation at all
     const Vec3 b( 2.0f, 1.0f, 0.0f );
-    VectorEquals<float>( Vec3( 2.0f,  0.707106f,  0.707106f ), rotateAroundX( b, 45.0f ) );
-    VectorEquals<float>( Vec3( 2.0f,  0.0f,       1.0f ),      rotateAroundX( b, 90.0f ) );
-    VectorEquals<float>( Vec3( 2.0f, -1.0f,       0.0f ),      rotateAroundX( b, 180.0f ) );
-    VectorEquals<float>( Vec3( 2.0f, -0.707106f, -0.707106f ), rotateAroundX( b, 225.0f ) );
-    VectorEquals<float>( Vec3( 2.0f,  0.0f,      -1.0f ),      rotateAroundX( b, 270.0f ) );
-    VectorEquals<float>( Vec3( 2.0f,  0.707106f, -0.707106f ), rotateAroundX( b, 315.0f ) );
+    VectorEquals( Vec3( 2.0f,  0.707106f,  0.707106f ), rotateAroundX( b, 45.0f ) );
+    VectorEquals( Vec3( 2.0f,  0.0f,       1.0f ),      rotateAroundX( b, 90.0f ) );
+    VectorEquals( Vec3( 2.0f, -1.0f,       0.0f ),      rotateAroundX( b, 180.0f ) );
+    VectorEquals( Vec3( 2.0f, -0.707106f, -0.707106f ), rotateAroundX( b, 225.0f ) );
+    VectorEquals( Vec3( 2.0f,  0.0f,      -1.0f ),      rotateAroundX( b, 270.0f ) );
+    VectorEquals( Vec3( 2.0f,  0.707106f, -0.707106f ), rotateAroundX( b, 315.0f ) );
 }
 
 TEST(Math, Vector3_RotateAroundYZero)
@@ -460,4 +462,39 @@ TEST(Math, Vector3_RotateAroundAxisZero)
 {
     const Vec3 a( 4.0f, -5.0f, 2.5f );
     EXPECT_EQ( a, rotateAround( a, Vec3( 1.0f, 1.0f, 1.0f ), 0.0f ) );
+}
+
+TEST(Math, Vector3_Lerp)
+{
+    const Vec3 a( 1.0f, 2.0f, 3.0f );
+    const Vec3 b( 2.0f, 4.0f, 6.0f );
+
+    EXPECT_TRUE( VectorEquals( Vec3( 1.0f, 2.0f, 3.0f ), lerp( a, b, 0.0f ) ) );
+    EXPECT_TRUE( VectorEquals( Vec3( 1.5f, 3.0f, 4.5f ), lerp( a, b, 0.5f ) ) );
+    EXPECT_TRUE( VectorEquals( Vec3( 2.0f, 4.0f, 6.0f ), lerp( a, b, 1.0f ) ) );
+}
+
+TEST(Math, Vector3_Min)
+{
+    const Vec3 a( 1.0f, 3.0f, 5.0f );
+    const Vec3 b( 1.5f, 2.0f, 6.5f );
+
+    EXPECT_TRUE( VectorEquals( Vec3( 1.0f, 2.0f, 5.0f ), min( a, b ) ) );
+}
+
+TEST(Math, Vector3_Max)
+{
+    const Vec3 a( 1.0f, 3.0f, 5.0f );
+    const Vec3 b( 1.5f, 2.0f, 6.5f );
+
+    EXPECT_TRUE( VectorEquals( Vec3( 1.5f, 3.0f, 6.5f ), max( a, b ) ) );
+}
+
+TEST(Math, Vector3_Clamp)
+{
+    const Vec3 a( 1.5f, 1.5f, 4.5f );
+    const Vec3 min( 1.0f, 2.0f, 3.0f );
+    const Vec3 max( 2.0f, 3.0f, 4.0f );
+
+    EXPECT_TRUE( VectorEquals( Vec3( 1.5f, 2.0f, 4.0f ), clamp( a, min, max ) ) );
 }

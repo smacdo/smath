@@ -364,3 +364,39 @@ TEST(Math, Vector4_Serialization)
 {
 
 }
+
+TEST(Math, Vector4_Lerp)
+{
+    const Vec4 a( 1.0f, 2.0f, 3.0f, 5.0f );
+    const Vec4 b( 2.0f, 4.0f, 6.0f, 10.0f );
+    
+    EXPECT_TRUE( VectorEquals( Vec4( 1.0f, 2.0f, 3.0f, 5.0f ), lerp( a, b, 0.0f ) ) );
+    EXPECT_TRUE( VectorEquals( Vec4( 1.5f, 3.0f, 4.5f, 7.5f ), lerp( a, b, 0.5f ) ) );
+    EXPECT_TRUE( VectorEquals( Vec4( 2.0f, 4.0f, 6.0f, 10.0f ), lerp( a, b, 1.0f ) ) );
+}
+
+TEST(Math, Vector4_Min)
+{
+    const Vec4 a( 1.0f, 3.0f, 5.0f, 7.0f );
+    const Vec4 b( 1.5f, 2.0f, 6.5f, 6.5f );
+
+    EXPECT_TRUE( VectorEquals( Vec4( 1.0f, 2.0f, 5.0f, 6.5f ), min( a, b ) ) );
+}
+
+TEST(Math, Vector4_Max)
+{
+    const Vec4 a( 1.0f, 3.0f, 5.0f, 7.0f );
+    const Vec4 b( 1.5f, 2.0f, 6.5f, 6.5f );
+
+    EXPECT_TRUE( VectorEquals( Vec4( 1.5f, 3.0f, 6.5f, 7.0f ), max( a, b ) ) );
+}
+
+TEST(Math, Vector4_Clamp)
+{
+    const Vec4 a( 1.5f, 1.5f, 4.5f, 2.5f );
+    const Vec4 min( 1.0f, 2.0f, 3.0f, 4.0f );
+    const Vec4 max( 2.0f, 3.0f, 4.0f, 5.0f );
+
+    EXPECT_TRUE( VectorEquals( Vec4( 1.5f, 2.0f, 4.0f, 4.0f ), clamp( a, min, max ) ) );
+}
+

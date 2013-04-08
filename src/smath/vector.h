@@ -18,6 +18,7 @@
 
 #include <smath/config.h>
 #include <smath/util.h>
+#include <smath/interpolation.h>
 #include <smath/constants.h>
 #include <ostream>
 
@@ -44,6 +45,18 @@ template<typename T> T lengthSquared( const TVector2<T>& v );
 template<typename T> TVector4<T> normalized( const TVector4<T>& v );
 template<typename T> TVector3<T> normalized( const TVector3<T>& v );
 template<typename T> TVector2<T> normalized( const TVector2<T>& v );
+template<typename T> TVector4<T> lerp( const TVector4<T>& a, const TVector4<T>& b, T t );
+template<typename T> TVector3<T> lerp( const TVector3<T>& a, const TVector3<T>& b, T t );
+template<typename T> TVector2<T> lerp( const TVector2<T>& a, const TVector2<T>& b, T t );
+template<typename T> TVector4<T> max( const TVector4<T>& a, const TVector4<T>& b );
+template<typename T> TVector3<T> max( const TVector3<T>& a, const TVector3<T>& b );
+template<typename T> TVector2<T> max( const TVector2<T>& a, const TVector2<T>& b );
+template<typename T> TVector4<T> min( const TVector4<T>& a, const TVector4<T>& b );
+template<typename T> TVector3<T> min( const TVector3<T>& a, const TVector3<T>& b );
+template<typename T> TVector2<T> min( const TVector2<T>& a, const TVector2<T>& b );
+template<typename T> TVector4<T> clamp( const TVector4<T>& v, const TVector4<T>& min, const TVector4<T>& max );
+template<typename T> TVector3<T> clamp( const TVector3<T>& v, const TVector3<T>& min, const TVector3<T>& max );
+template<typename T> TVector2<T> clamp( const TVector2<T>& v, const TVector2<T>& min, const TVector2<T>& max );
 template<typename T> TVector3<T> rotateAroundX( const TVector3<T>& v, T angle );
 template<typename T> TVector3<T> rotateAroundY( const TVector3<T>& v, T angle );
 template<typename T> TVector3<T> rotateAroundZ( const TVector3<T>& v, T angle );
@@ -372,6 +385,23 @@ public:
 
     // Returns normalized version of this vector
     friend TVector4<T> normalized<>( const TVector4<T>& v );
+
+    // Linearly interpolates two vectors based on a third value ranging from 0.0 to 1.0.
+    friend TVector4<T> lerp<>( const TVector4<T>& a, const TVector4<T>& b, T t );
+
+    // Componentwise operation that returns a vector containing the minimum x/y/z/w values
+    // selected from the two input vectors.
+    friend TVector4<T> min<>( const TVector4<T>& a, const TVector4<T>& b );
+
+    // Componentwise operation that returns a vector containing the maximum x/y/z/w values
+    // selected from the two input vectors.
+    friend TVector4<T> max<>( const TVector4<T>& a, const TVector4<T>& b );
+
+    // Componentwise operation that returns a vector containing x/y/z/w values taken from
+    // the input 'v' vector, clamped to the min and max inputs.
+    friend TVector4<T> clamp<>( const TVector4<T>& v,
+                                const TVector4<T>& min,
+                                const TVector4<T>& max );
 
 private:
     union
@@ -747,6 +777,23 @@ public:
      */
     friend TVector3<T> normalized<>( const TVector3<T>& v );
 
+    // Linearly interpolates two vectors based on a third value ranging from 0.0 to 1.0.
+    friend TVector3<T> lerp<>( const TVector3<T>& a, const TVector3<T>& b, T t );
+
+    // Componentwise operation that returns a vector containing the minimum x/y/z/w values
+    // selected from the two input vectors.
+    friend TVector3<T> min<>( const TVector3<T>& a, const TVector3<T>& b );
+
+    // Componentwise operation that returns a vector containing the maximum x/y/z/w values
+    // selected from the two input vectors.
+    friend TVector3<T> max<>( const TVector3<T>& a, const TVector3<T>& b );
+
+    // Componentwise operation that returns a vector containing x/y/z/w values taken from
+    // the input 'v' vector, clamped to the min and max inputs.
+    friend TVector3<T> clamp<>( const TVector3<T>& v,
+                                const TVector3<T>& min,
+                                const TVector3<T>& max );
+
 private:
     union
 	{
@@ -1054,6 +1101,23 @@ public:
      */
     friend TVector2<T> normalized<>( const TVector2<T>& v );
 
+    // Linearly interpolates two vectors based on a third value ranging from 0.0 to 1.0.
+    friend TVector4<T> lerp<>( const TVector4<T>& a, const TVector4<T>& b, T t );
+
+    // Componentwise operation that returns a vector containing the minimum x/y/z/w values
+    // selected from the two input vectors.
+    friend TVector2<T> min<>( const TVector2<T>& a, const TVector2<T>& b );
+
+    // Componentwise operation that returns a vector containing the maximum x/y/z/w values
+    // selected from the two input vectors.
+    friend TVector2<T> max<>( const TVector2<T>& a, const TVector2<T>& b );
+
+    // Componentwise operation that returns a vector containing x/y/z/w values taken from
+    // the input 'v' vector, clamped to the min and max inputs.
+    friend TVector2<T> clamp<>( const TVector2<T>& v,
+                                const TVector2<T>& min,
+                                const TVector2<T>& max );
+
 private:
     union
 	{
@@ -1160,6 +1224,128 @@ template<> TVector3<float> rotateAround( const TVector3<float>& v,
                                          float angle );
 
 template<typename T>
+TVector4<T> lerp( const TVector4<T>& a, const TVector4<T>& b, T t )
+{
+    return TVector4<T>(
+            Math::lerp( a.x(), b.x(), t ),
+            Math::lerp( a.y(), b.y(), t ),
+            Math::lerp( a.z(), b.z(), t ),
+            Math::lerp( a.w(), b.w(), t )
+    );
+}
+
+template<typename T>
+TVector3<T> lerp( const TVector3<T>& a, const TVector3<T>& b, T t )
+{
+    return TVector3<T>(
+            Math::lerp( a.x(), b.x(), t ),
+            Math::lerp( a.y(), b.y(), t ),
+            Math::lerp( a.z(), b.z(), t )
+    );
+}
+
+template<typename T>
+TVector2<T> lerp( const TVector2<T>& a, const TVector2<T>& b, T t )
+{
+    return TVector2<T>(
+            Math::lerp( a.x(), b.x(), t ),
+            Math::lerp( a.y(), b.y(), t )
+    );
+}
+
+template<typename T>
+TVector4<T> min( const TVector4<T>& a, const TVector4<T>& b )
+{
+    return TVector4<T>(
+            Math::min( a.x(), b.x() ),
+            Math::min( a.y(), b.y() ),
+            Math::min( a.z(), b.z() ),
+            Math::min( a.w(), b.w() )
+    );
+}
+
+template<typename T>
+TVector3<T> min( const TVector3<T>& a, const TVector3<T>& b )
+{
+    return TVector3<T>(
+            Math::min( a.x(), b.x() ),
+            Math::min( a.y(), b.y() ),
+            Math::min( a.z(), b.z() )
+    );
+}
+
+template<typename T>
+TVector2<T> min( const TVector2<T>& a, const TVector2<T>& b )
+{
+    return TVector2<T>(
+            Math::min( a.x(), b.x() ),
+            Math::min( a.y(), b.y() )
+    );
+}
+
+template<typename T>
+TVector4<T> max( const TVector4<T>& a, const TVector4<T>& b )
+{
+    return TVector4<T>(
+            Math::max( a.x(), b.x() ),
+            Math::max( a.y(), b.y() ),
+            Math::max( a.z(), b.z() ),
+            Math::max( a.w(), b.w() )
+    );
+}
+
+template<typename T>
+TVector3<T> max( const TVector3<T>& a, const TVector3<T>& b )
+{
+    return TVector3<T>(
+            Math::max( a.x(), b.x() ),
+            Math::max( a.y(), b.y() ),
+            Math::max( a.z(), b.z() )
+    );
+}
+
+template<typename T>
+TVector2<T> max( const TVector2<T>& a, const TVector2<T>& b )
+{
+    return TVector2<T>(
+            Math::max( a.x(), b.x() ),
+            Math::max( a.y(), b.y() )
+    );
+}
+
+template<typename T>
+TVector4<T> clamp( const TVector4<T>& v, const TVector4<T>& min, const TVector4<T>& max )
+{
+    return TVector4<T>(
+            Math::clamp( v.x(), min.x(), max.x() ),
+            Math::clamp( v.y(), min.y(), max.y() ),
+            Math::clamp( v.z(), min.z(), max.z() ),
+            Math::clamp( v.w(), min.w(), max.w() )
+    );
+}
+
+template<typename T>
+TVector3<T> clamp( const TVector3<T>& v, const TVector3<T>& min, const TVector3<T>& max )
+{
+    return TVector3<T>(
+            Math::clamp( v.x(), min.x(), max.x() ),
+            Math::clamp( v.y(), min.y(), max.y() ),
+            Math::clamp( v.z(), min.z(), max.z() )
+    );
+}
+
+
+template<typename T>
+TVector2<T> clamp( const TVector2<T>& v, const TVector2<T>& min, const TVector2<T>& max )
+{
+    return TVector2<T>(
+            Math::clamp( v.x(), min.x(), max.x() ),
+            Math::clamp( v.y(), min.y(), max.y() )
+    );
+}
+
+
+template<typename T>
 std::ostream& operator << ( std::ostream& os, const TVector4<T>& v )
 {
     os << "<"
@@ -1189,15 +1375,15 @@ std::ostream& operator << ( std::ostream& os, const TVector2<T>& v )
 // Vector typedefs - typedef common vector types
 /////////////////////////////////////////////////////////////////////////////
 #ifdef MATH_TYPEDEFS
-typedef TVector4<scalar_t> Vec4;
+typedef TVector4<float> Vec4;
 typedef TVector4<float> Vec4f;
 typedef TVector4<double> Vec4d;
 
-typedef TVector3<scalar_t> Vec3;
+typedef TVector3<float> Vec3;
 typedef TVector3<float> Vec3f;
 typedef TVector3<double> Vec3d;
 
-typedef TVector2<scalar_t> Vec2;
+typedef TVector2<float> Vec2;
 typedef TVector2<float> Vec2f;
 typedef TVector2<double> Vec2d;
 #endif
