@@ -31,7 +31,10 @@ TEST(Math,Math_RotationAroundZ)
 
 TEST(Math,Math_RotationAroundAxis)
 {
-    Mat4 m = Math::createRotationAroundAxis( 45.0f, 25.0f, 180.0f );
+    Mat4 m = Math::createRotationAroundAxis(
+                    TVector3<float>( 1.0f, 0.0f, 0.0f ),
+                    45.0f );
+
     EXPECT_EQ( m, m );
 }
 

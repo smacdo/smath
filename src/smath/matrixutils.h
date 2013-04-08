@@ -68,14 +68,38 @@ namespace Math
 
     /**
      * Generates a new matrix that rotates any given vector around the
-     * specified axis
+     * specified axis.
+     *  Source: Sean Barrett's stb_vec.h
      */
     template<typename T>
-    TMatrix4<T> createRotationAroundAxis( T /*xAngle*/,
-                                          T /*yAngle*/,
-                                          T /*zAngle*/ )
+    TMatrix4<T> createRotationAroundAxis( const TVector3<T>& axis, T angle )
     {
-        return TMatrix4<T>::IDENTITY;
+        T s  = sin( angle );
+        T c  = cos( angle );
+        T ic = 1 - c;
+
+        TVector3<T> p = normalized( axis );
+
+        T x = p.x();
+        T y = p.y();
+        T z = p.z();
+
+        T m00 = c + ic * x * x;
+        T m01 = ic * x * y + s * z;
+        T m02 = ic * x * z - s * y;
+
+        T m10 = ic * y * x - s * z;
+        T m11 = c + ic * y * y ;
+        T m12 = ic * y * z + s * x;
+
+        T m20 = ic * z * x + s * y;
+        T m21 = ic * z * y - s * x;
+        T m22 = c + ic * z * z;
+
+        return TMatrix4<T>( m00,  m01, m02, 0,
+                            m10,  m11, m12, 0,
+                            m20,  m21, m22, 0,
+                            0,    0,   0,   1 );
     }
 
     /**
