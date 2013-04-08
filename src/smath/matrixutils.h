@@ -45,9 +45,9 @@ namespace Math
         T s = sinf( angle );
         T c = cosf( angle );
 
-        return TMatrix4<T>( c,    0.0f, -s,   0.0f,
+        return TMatrix4<T>( c,    0.0f, s,    0.0f,
                             0.0f, 1.0f, 0.0f, 0.0f,
-                            s,    0.0f, c,    0.0f,
+                            -s,   0.0f, c,    0.0f,
                             0.0f, 0.0f, 0.0f, 1.0f );
     }
 
