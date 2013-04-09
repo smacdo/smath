@@ -173,6 +173,11 @@ public:
         return false;
     }
 
+    float area() const
+    {
+        return mSize.x() * mSize.y();
+    }
+
 private:
     TVector2<float> mTopLeft;
     TVector2<float> mSize;
