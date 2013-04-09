@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <smath/vector.h>
 #include <smath/matrix.h>
+#include <smath/quaternion.h>
 
 using namespace testing;
 
@@ -116,6 +117,34 @@ bool AlmostEquals( float a, float b, float maxDiff, int maxUlps )
 
 ::testing::AssertionResult VectorEquals( const TVector4<float>& expected,
                                          const TVector4<float>& actual )
+{
+    bool xe = AlmostEquals( expected[0], actual[0] );
+    bool ye = AlmostEquals( expected[1], actual[1] );
+    bool ze = AlmostEquals( expected[2], actual[2] );
+    bool we = AlmostEquals( expected[3], actual[3] );
+
+    if ( xe && ye && ze && we )
+    {
+        return ::testing::AssertionSuccess();
+    }
+    else
+    {
+        return ::testing::AssertionFailure()
+            << "Expected <"
+            << expected[0] << ", "
+            << expected[1] << ", "
+            << expected[2] << ", "
+            << expected[3] << ">\n"
+            << "Actual <"
+            << actual[0]   << ", "
+            << actual[1]   << ", "
+            << actual[2]   << ", "
+            << actual[3]   << ">";
+    }
+}
+
+::testing::AssertionResult QuaternionEquals( const TQuaternion<float>& expected,
+                                             const TQuaternion<float>& actual )
 {
     bool xe = AlmostEquals( expected[0], actual[0] );
     bool ye = AlmostEquals( expected[1], actual[1] );

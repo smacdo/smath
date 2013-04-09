@@ -26,6 +26,9 @@ template<typename T> T normal( const TQuaternion<T>& q );
 template<typename T> TQuaternion<T> conjugate( const TQuaternion<T>& q );
 template<typename T> TQuaternion<T> inverse( const TQuaternion<T>& q );
 template<typename T> TQuaternion<T> normalize( const TQuaternion<T>& q );
+template<typename T> TQuaternion<T> lerp( const TQuaternion<T>& a,
+                                          const TQuaternion<T>& b,
+                                          T t );
 
 /**
  * Quaternions are used to represent rotations in the game engine. Quaternions
@@ -272,6 +275,9 @@ public:
     // Normalize a quaternion
     friend TQuaternion<T> normalize<>( const TQuaternion<T>& q );
 
+    // Linearly interpolate a quarternion.
+    friend TQuaternion<T> lerp<>( const TQuaternion<T>& a, const TQuaternion<T>& b, T t );
+
 public:
     static const TQuaternion<T> ZERO;
     static const TQuaternion<T> IDENTITY;
@@ -330,6 +336,20 @@ TQuaternion<T> normalize( const TQuaternion<T>& q )
 {
     T mag = normal( q );
     return TQuaternion<T>( q.mW / mag, q.mX / mag, q.mY / mag, q.mZ / mag );
+}
+
+/**
+ * Linearly interpolate two quaternions based on a third value ranging from 0.0 to 1.0
+ */
+template<typename T>
+TQuaternion<T> lerp( const TQuaternion<T>& a, const TQuaternion<T>& b, T t )
+{
+    return TQuaternion<T>(
+        a.mW + t * ( b.mW - a.mW ),
+        a.mX + t * ( b.mX - a.mX ),
+        a.mY + t * ( b.mY - a.mY ),
+        a.mZ + t * ( b.mZ - a.mZ )
+    );
 }
 
 /**

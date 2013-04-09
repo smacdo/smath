@@ -6,6 +6,8 @@
 #include <smath/quaternion.h>
 #include <cmath>
 
+#include "unittesthelpers.h"
+
 #ifndef MATH_TYPEDEFS
 typedef TQuaternion<float> Quat;
 #endif
@@ -271,4 +273,14 @@ TEST(Math, Quaternion_Identity)
     EXPECT_FLOAT_EQ( q.y(), 0.0f );
     EXPECT_FLOAT_EQ( q.z(), 0.0f );
     EXPECT_FLOAT_EQ( q.w(), 1.0f );
+}
+
+TEST(Math, Quaternion_Lerp)
+{
+    const Quat a( 1.0f, 2.0f, 3.0f, 5.0f );
+    const Quat b( 2.0f, 4.0f, 6.0f, 10.0f );
+
+    EXPECT_TRUE( QuaternionEquals( Quat( 1.0f, 2.0f, 3.0f, 5.0f ), lerp( a, b, 0.0f ) ) );
+    EXPECT_TRUE( QuaternionEquals( Quat( 1.5f, 3.0f, 4.5f, 7.5f ), lerp( a, b, 0.5f ) ) );
+    EXPECT_TRUE( QuaternionEquals( Quat( 2.0f, 4.0f, 6.0f, 10.0f ), lerp( a, b, 1.0f ) ) );
 }
