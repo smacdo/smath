@@ -68,89 +68,106 @@
 #include <smath/util.h>
 
 #include <cassert>
+#include <cstdio>
 #include <stdint.h>
 
 using namespace MT19937Constants;
 
 Random::Random()
-    : mSeed( INITIAL_SEED ),
-      mIndex( 0u ),
+    : mpState( new random_state_t ),
       mHasNextGaussian( false ),
       mNextGaussian( 0 )
 {
-    init( mSeed );
+    init( mpState, INITIAL_SEED );
 }
 
 Random::Random( uint32_t seed )
-    : mSeed( seed ),
-      mIndex( 0u ),
+    : mpState( new random_state_t ),
       mHasNextGaussian( false ),
       mNextGaussian( 0 )
 {
-    init( mSeed );
+    init( mpState, seed );
 }
 
 Random::Random( const Random& v )
-    : mSeed( v.mSeed ),
-      mIndex( v.mIndex ),
+    : mpState( new random_state_t ),
       mHasNextGaussian( v.mHasNextGaussian ),
       mNextGaussian( v.mNextGaussian )
 {
-    std::copy( &v.mState[0], &v.mState[N], &mState[0] );
+    std::copy( &v.mpState->vals[0], &v.mpState->vals[N], &mpState->vals[0] );
 }
 
 Random::~Random()
 {
-    // empty
+    delete mpState;
 }
 
 Random& Random::operator = ( const Random& rhs )
 {
     if ( this != &rhs )
     {
-        mSeed  = rhs.mSeed;
-        mIndex = rhs.mIndex;
+        delete mpState;
+        mpState = new random_state_t();
+
+        mpState->seed  = rhs.mpState->seed;
+        mpState->index = rhs.mpState->index;
     
-        std::copy( &rhs.mState[0], &rhs.mState[N], &mState[0] );
+        std::copy( &rhs.mpState->vals[0], &rhs.mpState->vals[N], &mpState->vals[0] );
     }
 
     return *this;
 }
 
-void Random::init( uint32_t seed )
+void Random::init( random_state_t *pState, uint32_t seed )
 {
-    mState[0] = seed & 0xffffffffUL;
+    assert( pState != NULL );
+    
+    pState->vals[0] = seed & 0xffffffffUL;
+    pState->seed    = seed;
 
-    for ( mIndex = 1; mIndex < N; ++mIndex )
+    uint32_t * pVals = pState->vals;
+    size_t& index = pState->index;
+
+    for ( index = 1; index < N; ++index )
     {
-        mState[mIndex] = (1812433253UL * (mState[mIndex-1] ^ (mState[mIndex-1] >> 30)) + mIndex);
+        pVals[index] = (1812433253UL * (pVals[index-1] ^ (pVals[index-1] >> 30)) + index);
 
         // See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier.
         // In the previous versions, MSBs of the seed affect
         // only MSBs of the array mt[].
         // 2002/01/09 modified by Makoto Matsumoto
-        mState[mIndex] &= 0xffffffffUL; // for 32 bit machines
+        pVals[index] &= 0xffffffffUL; // for 32 bit machines
     }
 }
 
-void Random::initByArray( uint32_t key[], size_t length )
+void Random::initByArray( random_state_t * pState, uint32_t * pKey, size_t length )
 {
+    assert( pState != NULL );
+    assert( pKey != NULL );
+
+    // Initial values.
     size_t i = 1, j = 0;
     int k = ( N > length ? N : length );
-    init( 19650218UL );     // what's this magic number represent?
+    
+    // Initialize the mersenne twister state once with an initial seed value.
+    init( pState, 19650218UL );     // what's this magic number represent?
 
+    // Shortcuts to avoid verbose referencing of pState.
+    uint32_t * pVals = pState->vals;
+
+    // Now initialize the mersenne twister state again with the provided state array.
     for ( ; k; --k )
     {
-        mState[i]  = ( mState[i] ^ (( mState[i - 1] ^ ( mState[i-1] >> 30 )) * 1664525UL))
-            + key[j] + j;   // non-linear... ?
-        mState[i] &= 0xffffffffUL; // for WORDSIZE > 32 machines
+        pVals[i]  = ( pVals[i] ^ (( pVals[i - 1] ^ ( pVals[i-1] >> 30 )) * 1664525UL))
+            + pKey[j] + j;   // non-linear... ?
+        pVals[i] &= 0xffffffffUL; // for WORDSIZE > 32 machines
 
         i++;
         j++;
 
         if ( i >= N )
         {
-            mState[0] = mState[N - 1];
+            pVals[0] = pVals[N - 1];
             i = 1;
         }
 
@@ -162,20 +179,20 @@ void Random::initByArray( uint32_t key[], size_t length )
 
     for ( k = N - 1; k; k-- )
     {
-        mState[i]  = ( mState[i] ^ (( mState[i - 1] ^ ( mState[i - 1] >> 30 )) ^ 1566083941UL))
+        pVals[i]  = ( pVals[i] ^ (( pVals[i - 1] ^ ( pVals[i - 1] >> 30 )) ^ 1566083941UL))
             - i; // non linear. again - ?
-        mState[i] &= 0xffffffffUL; // for WORDSIZE > 32 machines
+        pVals[i] &= 0xffffffffUL; // for WORDSIZE > 32 machines
 
         i++;
 
         if ( i >= N )
         {
-            mState[0] = mState[N - 1];
+            pVals[0] = pVals[N - 1];
             i = 1;
         }
     }
     
-    mState[0] = 0x80000000UL; // MSB is 1; assuring non-zero initial array
+    pVals[0] = 0x80000000UL; // MSB is 1; assuring non-zero initial array
 }
 
 unsigned int Random::nextUInt()
@@ -183,35 +200,30 @@ unsigned int Random::nextUInt()
     static uint32_t MAG01[2] = { 0x0UL, MATRIX_A };
     uint32_t y;
 
-    if ( mIndex >= N )          // Generate N words at a time
+    if ( mpState->index >= N )          // Generate N words at a time
     {
         uint32_t kk;
 
-        if ( mIndex == N+1 )        // if init() has not been called (remove this)
-        {
-            init( INITIAL_SEED );
-        }
-
         for ( kk = 0; kk < N - M; ++kk )
         {
-            y = ( mState[kk] & UPPER_MASK ) | ( mState[kk+1] & LOWER_MASK );
-            mState[kk] = mState[kk + M] ^ ( y >> 1 ) ^ MAG01[y & 0x1UL];
+            y = ( mpState->vals[kk] & UPPER_MASK ) | ( mpState->vals[kk+1] & LOWER_MASK );
+            mpState->vals[kk] = mpState->vals[kk + M] ^ ( y >> 1 ) ^ MAG01[y & 0x1UL];
         }
 
         for ( ; kk < N - 1; ++kk )
         {
-            y = ( mState[kk] & UPPER_MASK ) | ( mState[kk + 1] & LOWER_MASK );
-            mState[kk] = mState[kk + ( M - N )] ^ ( y >> 1 ) ^ MAG01[y & 0x1UL];
+            y = ( mpState->vals[kk] & UPPER_MASK ) | ( mpState->vals[kk + 1] & LOWER_MASK );
+            mpState->vals[kk] = mpState->vals[kk + ( M - N )] ^ ( y >> 1 ) ^ MAG01[y & 0x1UL];
         }
 
-        y = ( mState[N - 1] & UPPER_MASK ) | ( mState[0] & LOWER_MASK );
-        mState[N-1] = mState[M - 1] ^ ( y >> 1 ) ^ MAG01[y & 0x1UL];
+        y = ( mpState->vals[N - 1] & UPPER_MASK ) | ( mpState->vals[0] & LOWER_MASK );
+        mpState->vals[N-1] = mpState->vals[M - 1] ^ ( y >> 1 ) ^ MAG01[y & 0x1UL];
 
-        mIndex = 0;
+        mpState->index = 0;
     }
 
     // Get next random value in sequence
-    y = mState[ mIndex++ ];
+    y = mpState->vals[ mpState->index++ ];
 
     // Tempering
     y ^= ( y >> 11 );
@@ -349,4 +361,15 @@ float Random::nextGaussian( float standardDeviation, float mean, float min, floa
 {
     float v = nextGaussian() * standardDeviation + mean;
     return Math::clamp( v, min, max );
+}
+
+unsigned int Random::getRandomSeed()
+{
+    unsigned int seed = 0u;
+    FILE * pRandom = fopen( "/dev/urandom", "r" );
+    
+    fread( &seed, sizeof( seed ), 1, pRandom );
+    fclose( pRandom );
+
+    return seed;
 }

@@ -27,8 +27,22 @@ namespace MT19937Constants
     const uint32_t MATRIX_A = 0x9908B0DFU;
     const uint32_t UPPER_MASK = 0x80000000U;
     const uint32_t LOWER_MASK = 0x7fffffffU;
+    const uint32_t DEFAULT_SEED = 9812341;
     const uint32_t INITIAL_SEED = 5489U;
 }
+
+struct random_state_t
+{
+    random_state_t()
+        : seed( 0u ),
+          index( 0u )
+    {
+    }
+
+    uint32_t vals[MT19937Constants::N];
+    uint32_t seed;
+    size_t index;
+};
 
 /**
  * Random number generator.
@@ -67,14 +81,15 @@ public:
     float nextGaussian( float standardDeviation, float mean );
     float nextGaussian( float standardDeviation, float mean, float min, float max );
 
-private:
-    void init( uint32_t seed );
-    void initByArray( uint32_t key[], size_t length );
+public:
+    static unsigned int getRandomSeed();
 
 private:
-    uint32_t mState[MT19937Constants::N];
-    uint32_t mSeed;
-    size_t mIndex;
+    void init( random_state_t * pState, uint32_t seed );
+    void initByArray( random_state_t * pState, uint32_t key[], size_t length );
+
+private:
+    random_state_t * mpState;
     bool mHasNextGaussian;
     float mNextGaussian;
 };
