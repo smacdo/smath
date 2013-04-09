@@ -24,6 +24,8 @@ set( smath_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/fastsqrt.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/hashfloat.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vector.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/random.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/randomstate.cpp
 )
 
 set( smath_TESTS

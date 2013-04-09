@@ -65,20 +65,21 @@
 // Feedback about this C++ port should be sent to Scott MacDonald. See
 // http://whitespaceconsideredharmful.com/ for contact information.
 #include <smath/random.h>
+#include <smath/randomstate.h>
 #include <smath/util.h>
 
 #include <cassert>
 #include <cstdio>
 #include <stdint.h>
 
-using namespace MT19937Constants;
+using namespace RandomConstants;
 
 Random::Random()
     : mpState( new random_state_t ),
       mHasNextGaussian( false ),
       mNextGaussian( 0 )
 {
-    init( mpState, INITIAL_SEED );
+    init( mpState, getRandomSeed()  );
 }
 
 Random::Random( uint32_t seed )
@@ -90,11 +91,10 @@ Random::Random( uint32_t seed )
 }
 
 Random::Random( const Random& v )
-    : mpState( new random_state_t ),
+    : mpState( new random_state_t( v.mpState ) ),
       mHasNextGaussian( v.mHasNextGaussian ),
       mNextGaussian( v.mNextGaussian )
 {
-    std::copy( &v.mpState->vals[0], &v.mpState->vals[N], &mpState->vals[0] );
 }
 
 Random::~Random()
@@ -107,12 +107,7 @@ Random& Random::operator = ( const Random& rhs )
     if ( this != &rhs )
     {
         delete mpState;
-        mpState = new random_state_t();
-
-        mpState->seed  = rhs.mpState->seed;
-        mpState->index = rhs.mpState->index;
-    
-        std::copy( &rhs.mpState->vals[0], &rhs.mpState->vals[N], &mpState->vals[0] );
+        mpState = new random_state_t( rhs.mpState );
     }
 
     return *this;

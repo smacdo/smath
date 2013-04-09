@@ -20,29 +20,7 @@
 #include <cstdlib>
 #include <algorithm>
 
-namespace MT19937Constants
-{
-    const uint32_t N = 624;
-    const uint32_t M = 396;
-    const uint32_t MATRIX_A = 0x9908B0DFU;
-    const uint32_t UPPER_MASK = 0x80000000U;
-    const uint32_t LOWER_MASK = 0x7fffffffU;
-    const uint32_t DEFAULT_SEED = 9812341;
-    const uint32_t INITIAL_SEED = 5489U;
-}
-
-struct random_state_t
-{
-    random_state_t()
-        : seed( 0u ),
-          index( 0u )
-    {
-    }
-
-    uint32_t vals[MT19937Constants::N];
-    uint32_t seed;
-    size_t index;
-};
+struct random_state_t;
 
 /**
  * Random number generator.
